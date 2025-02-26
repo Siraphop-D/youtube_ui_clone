@@ -1,0 +1,14 @@
+[
+    {
+      "icon": "assets/icons/short.svg",
+      "title" : "Create a short"
+    },
+    {
+      "icon": "assets/icons/upload.svg",
+      "title" : "Upload a video"
+    },
+    {
+      "icon": "assets/icons/live.svg",
+      "title" : "Go live"
+    }
+  ]
