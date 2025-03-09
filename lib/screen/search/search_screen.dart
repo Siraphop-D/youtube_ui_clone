@@ -50,7 +50,7 @@ class _SearchScreenState extends State<SearchScreen> {
             padding: EdgeInsets.all(3),
             duration: Duration(milliseconds: 300),
             width: isTyping ? screenWidth * 0.87 : screenWidth * 0.75,
-            height: screenHeight * 0.04,
+            height: screenHeight * 0.03,
             child: Row(
               children: [
                 Expanded(
@@ -140,49 +140,49 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget buildSearchBar() {
-    return Container(
-      margin: EdgeInsets.all(5),
-      width: screenWidth * 0.4,
-      height: screenHeight * 0.055,
-      decoration: BoxDecoration(
-        color: MyStyle().grey,
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: Colors.grey[700]!),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              child: TextField(
-                controller: searchController,
-                style: TextStyle(
-                  color: MyStyle().white,
-                  fontSize: screenHeight * 0.015,
-                ),
-                cursorColor: MyStyle().red,
-                decoration: InputDecoration(
-                  hintText: "Search",
-                  hintStyle: TextStyle(color: Colors.white54),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 10),
-                ),
-                onChanged: (value) {
-                  setState(() {});
-                },
-              ),
-            ),
-          ),
-          if (searchController.text.isNotEmpty)
-            IconButton(
-              icon: const Icon(Icons.clear, color: Colors.white54, size: 15),
-              onPressed: () {
-                searchController.clear();
-                setState(() {});
-              },
-            ),
+  // Widget buildSearchBar() {
+  //   return Container(
+  //     margin: EdgeInsets.all(5),
+  //     width: screenWidth * 0.4,
+  //     height: screenHeight * 0.055,
+  //     decoration: BoxDecoration(
+  //       color: MyStyle().grey,
+  //       borderRadius: BorderRadius.circular(25),
+  //       border: Border.all(color: Colors.grey[700]!),
+  //     ),
+  //     child: Row(
+  //       crossAxisAlignment: CrossAxisAlignment.center,
+  //       children: [
+  //         Expanded(
+  //           child: Padding(
+  //             padding: EdgeInsets.symmetric(horizontal: 10),
+  //             child: TextField(
+  //               controller: searchController,
+  //               style: TextStyle(
+  //                 color: MyStyle().white,
+  //                 fontSize: screenHeight * 0.015,
+  //               ),
+  //               cursorColor: MyStyle().red,
+  //               decoration: InputDecoration(
+  //                 hintText: "Search",
+  //                 hintStyle: TextStyle(color: Colors.white54),
+  //                 border: InputBorder.none,
+  //                 contentPadding: EdgeInsets.symmetric(vertical: 10),
+  //               ),
+  //               onChanged: (value) {
+  //                 setState(() {});
+  //               },
+  //             ),
+  //           ),
+  //         ),
+  //         if (searchController.text.isNotEmpty)
+  //           IconButton(
+  //             icon: const Icon(Icons.clear, color: Colors.white54, size: 15),
+  //             onPressed: () {
+  //               searchController.clear();
+  //               setState(() {});
+  //             },
+  //           ),
           // Container(
           //   width: screenWidth * 0.04,
           //   height: screenHeight * 0.055,
@@ -198,8 +198,8 @@ class _SearchScreenState extends State<SearchScreen> {
           //     onPressed: () {},
           //   ),
           // ),
-        ],
-      ),
-    );
-  }
+  //       ],
+  //     ),
+  //   );
+  // }
 }

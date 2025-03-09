@@ -2,18 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:youtube_ui_clone/components/custom_listtile.dart';
 import 'package:youtube_ui_clone/item/category_item.dart';
+import 'package:youtube_ui_clone/responsive/responsive_layout.dart';
 import 'package:youtube_ui_clone/screen/notification/notification_screen.dart';
 import 'package:youtube_ui_clone/screen/search/search_screen.dart';
 import 'package:youtube_ui_clone/utility/my_style.dart';
 
 class MyprofileScreen extends StatefulWidget {
-  final VoidCallback onBack;
-  final VoidCallback onNavigate;
-  const MyprofileScreen({
-    super.key,
-    required this.onBack,
-    required this.onNavigate,
-  });
+  final GlobalKey<NavigatorState> navigatorKey;
+  const MyprofileScreen({super.key, required this.navigatorKey});
 
   @override
   State<MyprofileScreen> createState() => _MyprofileScreenState();
@@ -34,83 +30,9 @@ class _MyprofileScreenState extends State<MyprofileScreen>
         body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
-              SliverAppBar(
-                backgroundColor: Colors.transparent,
-                expandedHeight: screenHeight * 0.33, // ความสูงตอนกางออก
-                pinned: true,
-                leading: IconButton(
-                  icon: Icon(Icons.arrow_back_ios),
-                  onPressed: widget.onBack,
-                ),
-                actions: [
-                  IconButton(
-                    onPressed: onTabCast,
-                    splashRadius: 25,
-                    icon: Icon(Icons.cast),
-                  ),
-
-                  IconButton(
-                    onPressed:
-                        () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SearchScreen(),
-                          ),
-                        ),
-                    splashRadius: 25,
-                    icon: Icon(Icons.search),
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    splashRadius: 25,
-                    icon: Icon(Icons.more_vert),
-                  ),
-                ],
-
-                flexibleSpace: LayoutBuilder(
-                  builder: (context, constraints) {
-                    double appBarHeight = constraints.biggest.height;
-                    bool isCollapsed = appBarHeight <= 200;
-
-                    return Container(
-                      decoration: BoxDecoration(color: MyStyle().dark),
-                      child: FlexibleSpaceBar(
-                        titlePadding: const EdgeInsets.only(
-                          left: 50,
-                          bottom: 62,
-                        ),
-                        centerTitle: false,
-                        title:
-                            isCollapsed
-                                ? const Text(
-                                  "Siraphop D",
-                                  style: TextStyle(color: Colors.white),
-                                )
-                                : null,
-
-                        background: Padding(
-                          padding: EdgeInsets.only(
-                            top: screenHeight * 0.13,
-                            left: screenHeight * 0.013,
-                            right: screenHeight * 0.013,
-                          ),
-                          child: buildProfile(),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                bottom: const TabBar(
-                  indicatorColor: Colors.white,
-                  labelColor: Colors.white,
-                  tabs: [
-                    Tab(text: "Home"),
-                    Tab(text: "Videos"),
-                    Tab(text: "Playlists"),
-                    Tab(text: "Posts"),
-                  ],
-                ),
-              ),
+              ResponsiveLayout.isMobile(context)
+                  ? buildSliverAppBarMobile(context)
+                  : buildSliverAppBarTablet(context),
             ];
           },
           body: TabBarView(
@@ -126,6 +48,160 @@ class _MyprofileScreenState extends State<MyprofileScreen>
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  SliverAppBar buildSliverAppBarTablet(BuildContext context) {
+    return SliverAppBar(
+      backgroundColor: Colors.transparent,
+      expandedHeight: screenHeight * 0.3, // ความสูงตอนกางออก
+      pinned: true,
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back_ios),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+      actions: [
+        IconButton(
+          onPressed: onTabCast,
+          splashRadius: 25,
+          icon: Icon(Icons.cast),
+        ),
+
+        IconButton(
+          onPressed:
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SearchScreen()),
+              ),
+          splashRadius: 25,
+          icon: Icon(Icons.search),
+        ),
+        IconButton(
+          onPressed: () {},
+          splashRadius: 25,
+          icon: Icon(Icons.more_vert),
+        ),
+      ],
+
+      flexibleSpace: LayoutBuilder(
+        builder: (context, constraints) {
+          double appBarHeight = constraints.biggest.height;
+          bool isCollapsed = appBarHeight <= 150;
+
+          return Container(
+            decoration: BoxDecoration(color: MyStyle().dark),
+            child: FlexibleSpaceBar(
+              titlePadding: const EdgeInsets.only(left: 50, bottom: 62),
+              centerTitle: false,
+              title:
+                  isCollapsed
+                      ? const Text(
+                        "Siraphop D",
+                        style: TextStyle(color: Colors.white),
+                      )
+                      : null,
+
+              background: Padding(
+                padding: EdgeInsets.only(
+                  top: screenHeight * 0.07,
+                  left: screenHeight * 0.013,
+                  right: screenHeight * 0.013,
+                ),
+                child: buildProfile(widget.navigatorKey),
+              ),
+            ),
+          );
+        },
+      ),
+      bottom: const TabBar(
+        indicatorColor: Colors.white,
+        labelColor: Colors.white,
+        tabs: [
+          Tab(text: "Home"),
+          Tab(text: "Videos"),
+          Tab(text: "Playlists"),
+          Tab(text: "Posts"),
+        ],
+      ),
+    );
+  }
+
+  SliverAppBar buildSliverAppBarMobile(BuildContext context) {
+    return SliverAppBar(
+      backgroundColor: Colors.transparent,
+      expandedHeight: screenHeight * 0.33, // ความสูงตอนกางออก
+      pinned: true,
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back_ios),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+      actions: [
+        IconButton(
+          onPressed: onTabCast,
+          splashRadius: 25,
+          icon: Icon(Icons.cast),
+        ),
+
+        IconButton(
+          onPressed:
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SearchScreen()),
+              ),
+          splashRadius: 25,
+          icon: Icon(Icons.search),
+        ),
+        IconButton(
+          onPressed: () {},
+          splashRadius: 25,
+          icon: Icon(Icons.more_vert),
+        ),
+      ],
+
+      flexibleSpace: LayoutBuilder(
+        builder: (context, constraints) {
+          double appBarHeight = constraints.biggest.height;
+          bool isCollapsed = appBarHeight <= 200;
+
+          return Container(
+            decoration: BoxDecoration(color: MyStyle().dark),
+            child: FlexibleSpaceBar(
+              titlePadding: const EdgeInsets.only(left: 50, bottom: 62),
+              centerTitle: false,
+              title:
+                  isCollapsed
+                      ? const Text(
+                        "Siraphop D",
+                        style: TextStyle(color: Colors.white),
+                      )
+                      : null,
+
+              background: Padding(
+                padding: EdgeInsets.only(
+                  top: screenHeight * 0.13,
+                  left: screenHeight * 0.013,
+                  right: screenHeight * 0.013,
+                ),
+                child: buildProfile(widget.navigatorKey),
+              ),
+            ),
+          );
+        },
+      ),
+      bottom: const TabBar(
+        indicatorColor: Colors.white,
+        labelColor: Colors.white,
+        tabs: [
+          Tab(text: "Home"),
+          Tab(text: "Videos"),
+          Tab(text: "Playlists"),
+          Tab(text: "Posts"),
+        ],
       ),
     );
   }
@@ -186,7 +262,7 @@ class _MyprofileScreenState extends State<MyprofileScreen>
     );
   }
 
-  buildProfile() {
+  buildProfile(GlobalKey<NavigatorState> navigatorKey) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -204,7 +280,7 @@ class _MyprofileScreenState extends State<MyprofileScreen>
                   'Name P',
                   style: TextStyle(
                     color: MyStyle().white,
-                    fontSize: screenHeight * 0.02,
+                    fontSize: screenHeight * 0.016,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -234,12 +310,20 @@ class _MyprofileScreenState extends State<MyprofileScreen>
                   "More about this channel",
                   style: TextStyle(
                     color: MyStyle().white,
-                    fontSize: screenHeight * 0.018,
+                    fontSize: screenHeight * 0.016,
                   ),
                 ),
                 TextButton(
-                  onPressed: widget.onNavigate,
-                  child: Text("...more", style: TextStyle(color: MyStyle().white,fontSize: screenHeight*0.018)),
+                  onPressed: () {
+                    navigatorKey.currentState!.pushNamed('/moreinfo');
+                  },
+                  child: Text(
+                    "...more",
+                    style: TextStyle(
+                      color: MyStyle().white,
+                      fontSize: screenHeight * 0.016,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -256,14 +340,15 @@ class _MyprofileScreenState extends State<MyprofileScreen>
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(25),
                 ),
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                fixedSize: Size.fromWidth(screenWidth * 0.64),
+                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                fixedSize: ResponsiveLayout.isMobile(context)? Size.fromWidth(screenWidth * 0.65):Size.fromWidth(screenWidth * 0.8),
+                
               ),
               child: Text(
                 "Manage videos",
                 style: TextStyle(
                   color: MyStyle().white,
-                  fontSize: screenHeight * 0.018,
+                  fontSize: screenHeight * 0.016,
                   fontWeight: FontWeight.bold,
                 ),
               ),

@@ -24,7 +24,7 @@ class CustomListTile extends StatelessWidget {
         padding: EdgeInsets.all(MyStyle().defaultSPadding),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: MyStyle().lightGrey
+          color: Colors.transparent
         ),
         child: leadingIcon
       ),

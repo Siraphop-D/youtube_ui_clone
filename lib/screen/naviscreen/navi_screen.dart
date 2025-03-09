@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:youtube_ui_clone/components/custom_listtile.dart';
-import 'package:youtube_ui_clone/components/drawer_button.dart';
 import 'package:youtube_ui_clone/components/navigation_button.dart';
-import 'package:youtube_ui_clone/components/navigation_button_desktop.dart';
 import 'package:youtube_ui_clone/item/create_item.dart';
-import 'package:youtube_ui_clone/responsive/desktop_scaffold.dart';
 import 'package:youtube_ui_clone/responsive/responsive_layout.dart';
+import 'package:youtube_ui_clone/screen/home/gaming_screen.dart';
 import 'package:youtube_ui_clone/screen/home/home_page.dart';
-import 'package:youtube_ui_clone/screen/profile/more_info.dart';
-import 'package:youtube_ui_clone/screen/profile/myprofile_screen.dart';
-import 'package:youtube_ui_clone/screen/profile/profile_screen.dart';
+import 'package:youtube_ui_clone/screen/home/music_screen.dart';
+import 'package:youtube_ui_clone/screen/home/news_screen.dart';
+import 'package:youtube_ui_clone/screen/home/sport_screen.dart';
+import 'package:youtube_ui_clone/screen/home/trending_screen.dart';
+import 'package:youtube_ui_clone/screen/profile/profile_navi.dart';
 import 'package:youtube_ui_clone/screen/short/short_screen.dart';
 import 'package:youtube_ui_clone/screen/subscription/subscription_all.dart';
 import 'package:youtube_ui_clone/screen/subscription/subscription_screen.dart';
@@ -27,7 +26,6 @@ class NaviScreen extends StatefulWidget {
 
 class _NaviScreenState extends State<NaviScreen> {
   int tabIndex = 0;
-  bool isExpanded = false;
   bool isAllSubscriptions = false;
   bool isMyProfile = false;
   bool isMoreInfo = false;
@@ -45,32 +43,11 @@ class _NaviScreenState extends State<NaviScreen> {
     return Scaffold(
       key: NaviScreen.scaffoldKey,
       body: buildBody(),
-      bottomNavigationBar: buildNavigationBar(),
-      // ResponsiveLayout.isDesktop(context)
-      //     ? buildNavigationBar()
-      //     : const SizedBox.shrink(),
+      bottomNavigationBar:
+          ResponsiveLayout.isMobile(context)
+              ? buildNavigationBar()
+              : buildTabletNavigationBar(),
       drawer: showDrawer(),
-    );
-  }
-
-  AppBar buildAppbar() {
-    return AppBar(
-      centerTitle: false,
-      title: SvgPicture.asset("assets/icons/logo.svg"),
-      backgroundColor: MyStyle().dark,
-      actions: [
-        IconButton(onPressed: () {}, splashRadius: 25, icon: Icon(Icons.cast)),
-        IconButton(
-          onPressed: () {},
-          splashRadius: 25,
-          icon: Icon(Icons.notifications_outlined),
-        ),
-        IconButton(
-          onPressed: () {},
-          splashRadius: 25,
-          icon: Icon(Icons.search),
-        ),
-      ],
     );
   }
 
@@ -95,138 +72,21 @@ class _NaviScreenState extends State<NaviScreen> {
                 });
               },
             ),
-
-        isMyProfile
-            ? MyprofileScreen(
-              onBack:
-                  () => setState(() {
-                    isMyProfile = false;
-                    isMoreInfo = false;
-                  }),
-              onNavigate:
-                  () => setState(() {
-                    isMoreInfo = true;
-                    isMyProfile = false;
-                  }),
-            )
-            : isMoreInfo
-            ? MoreInfo(
-              onBack:
-                  () => setState(() {
-                    isMyProfile = true;
-                  }),
-            )
-            : ProfileScreen(
-              onNavigate: () {
-                setState(() {
-                  isMyProfile = true;
-                });
-              },
-            ),
+        ProfileNavigator(),
       ],
     );
   }
 
   Widget buildNavigationBar() {
-    return ResponsiveLayout.isMobile(context)
-        ? LayoutBuilder(
-          builder: (context, constraints) {
-            double screenHeight = constraints.maxHeight;
-            double screenWidth = constraints.maxWidth;
-            double buttonSize = screenHeight * 0.025; // ปรับขนาดปุ่มตามหน้าจอ
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double screenHeight = constraints.maxHeight;
+        double screenWidth = constraints.maxWidth;
+        double buttonSize = screenHeight * 0.025; // ปรับขนาดปุ่มตามหน้าจอ
 
-            return Container(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-              height: screenHeight * 0.1, // ความสูงของ NavigationBar
-              decoration: BoxDecoration(
-                color: MyStyle().dark,
-                border: Border(
-                  top: BorderSide(width: 1.5, color: MyStyle().grey),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: MyStyle().grey,
-                    blurRadius: 2,
-                    spreadRadius: 1,
-                  ),
-                ],
-              ),
-              child: SafeArea(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceEvenly, // ให้ปุ่มห่างกันเท่ากัน
-                  children: [
-                    Expanded(
-                      child: buildNavItem(
-                        onTap: () => onChangeTab(0),
-                        isActive: tabIndex == 0,
-                        activeIconPath: "assets/icons/home_active.svg",
-                        inactiveIconPath: "assets/icons/home.svg",
-                        text: "Home",
-                        iconSize: buttonSize,
-                      ),
-                    ),
-                    Expanded(
-                      child: buildNavItem(
-                        onTap: () => onChangeTab(1),
-                        isActive: tabIndex == 1,
-                        activeIconPath: "assets/icons/short_active.svg",
-                        inactiveIconPath: "assets/icons/short.svg",
-                        text: "Short",
-                        iconSize: buttonSize,
-                      ),
-                    ),
-                    Expanded(
-                      child: IconButton(
-                        onPressed: onTabCreate,
-                        iconSize:
-                            buttonSize * 1.4, // ปรับขนาดให้ปุ่ม + ใหญ่ขึ้น
-                        icon: SvgPicture.asset(
-                          "assets/icons/add.svg",
-                          color: MyStyle().white,
-                          height: buttonSize * 1.4,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: buildNavItem(
-                        onTap: () => onChangeTab(2),
-                        isActive: tabIndex == 2,
-                        activeIconPath: "assets/icons/subscription_active.svg",
-                        inactiveIconPath: "assets/icons/subscription.svg",
-                        text: "Sub",
-                        iconSize: buttonSize,
-                      ),
-                    ),
-                    Expanded(
-                      child: buildNavItem(
-                        onTap: () => onChangeTab(3),
-                        isActive: tabIndex == 3,
-                        activeIconPath: "assets/icons/profile_active.svg",
-                        inactiveIconPath: "assets/icons/profile.svg",
-                        text: "You",
-                        iconSize: buttonSize,
-                        isProfile: true, // ใช้ CircleAvatar แทน
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        )
-        : buildTabletNavigationBar();
-  }
-
-  Widget buildTabletNavigationBar() {
-    return ResponsiveLayout.isTablet(context)
-        ? Container(
-          padding: EdgeInsets.only(
-            left: screenWidth * 0.1,
-            right: screenWidth * 0.1,
-          ),
-          height: screenHeight * 0.0839,
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+          height: screenHeight * 0.1, // ความสูงของ NavigationBar
           decoration: BoxDecoration(
             color: MyStyle().dark,
             border: Border(top: BorderSide(width: 1.5, color: MyStyle().grey)),
@@ -234,185 +94,181 @@ class _NaviScreenState extends State<NaviScreen> {
               BoxShadow(color: MyStyle().grey, blurRadius: 2, spreadRadius: 1),
             ],
           ),
-          child: Scaffold(
-            body: Container(
-              margin: EdgeInsets.only(
-                top: screenHeight * 0.009,
-                left: screenWidth * 0.1,
-                right: screenWidth * 0.1,
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: NavigationButton(
-                      onTap: () => onChangeTab(0),
-                      isActive: tabIndex == 0,
-                      alignment: Alignment.centerLeft,
-                      activeIcon: SvgPicture.asset(
-                        "assets/icons/home_active.svg",
-                        color: MyStyle().white,
-                      ),
-                      inactiveIcon: SvgPicture.asset(
-                        "assets/icons/home.svg",
-                        color: MyStyle().white,
-                      ),
-                      text: "Home",
+          child: SafeArea(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment:
+                  MainAxisAlignment.spaceEvenly, // ให้ปุ่มห่างกันเท่ากัน
+              children: [
+                Expanded(
+                  child: buildNavItem(
+                    onTap: () => onChangeTab(0),
+                    isActive: tabIndex == 0,
+                    activeIconPath: "assets/icons/home_active.svg",
+                    inactiveIconPath: "assets/icons/home.svg",
+                    text: "Home",
+                    iconSize: buttonSize,
+                  ),
+                ),
+                Expanded(
+                  child: buildNavItem(
+                    onTap: () => onChangeTab(1),
+                    isActive: tabIndex == 1,
+                    activeIconPath: "assets/icons/short_active.svg",
+                    inactiveIconPath: "assets/icons/short.svg",
+                    text: "Short",
+                    iconSize: buttonSize,
+                  ),
+                ),
+                Expanded(
+                  child: IconButton(
+                    onPressed: onTabCreate,
+                    iconSize: buttonSize * 1.4, // ปรับขนาดให้ปุ่ม + ใหญ่ขึ้น
+                    icon: SvgPicture.asset(
+                      "assets/icons/add.svg",
+                      color: MyStyle().white,
+                      height: buttonSize * 1.4,
                     ),
                   ),
-                  Expanded(
-                    flex: 3,
-                    child: NavigationButton(
-                      onTap: () => onChangeTab(1),
-                      isActive: tabIndex == 1,
-                      // alignment: Alignment.centerLeft,
-                      activeIcon: SvgPicture.asset(
-                        "assets/icons/short_active.svg",
-                        color: MyStyle().white,
-                      ),
-                      inactiveIcon: SvgPicture.asset(
-                        "assets/icons/short.svg",
-                        color: MyStyle().white,
-                      ),
-                      text: "Short",
-                    ),
+                ),
+                Expanded(
+                  child: buildNavItem(
+                    onTap: () => onChangeTab(2),
+                    isActive: tabIndex == 2,
+                    activeIconPath: "assets/icons/subscription_active.svg",
+                    inactiveIconPath: "assets/icons/subscription.svg",
+                    text: "Sub",
+                    iconSize: buttonSize,
                   ),
-                  Expanded(
-                    flex: 3,
-                    child: IconButton(
-                      onPressed: onTabCreate,
-                      padding: EdgeInsets.all(2),
-                      icon: SvgPicture.asset(
-                        "assets/icons/add.svg",
-                        color: MyStyle().white,
-                        height: 40,
-                      ),
-                    ),
+                ),
+                Expanded(
+                  child: buildNavItem(
+                    onTap: () => onChangeTab(3),
+                    isActive: tabIndex == 3,
+                    activeIconPath: "assets/icons/profile_active.svg",
+                    inactiveIconPath: "assets/icons/profile.svg",
+                    text: "You",
+                    iconSize: buttonSize,
+                    isProfile: true, // ใช้ CircleAvatar แทน
                   ),
-                  Expanded(
-                    flex: 3,
-                    child: NavigationButton(
-                      onTap: () => onChangeTab(2),
-                      isActive: tabIndex == 2,
-                      alignment: Alignment.centerRight,
-                      activeIcon: SvgPicture.asset(
-                        "assets/icons/subscription_active.svg",
-                        color: MyStyle().white,
-                      ),
-                      inactiveIcon: SvgPicture.asset(
-                        "assets/icons/subscription.svg",
-                        color: MyStyle().white,
-                      ),
-                      text: "Sub",
-                    ),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: NavigationButton(
-                      onTap: () => onChangeTab(3),
-                      isActive: tabIndex == 3,
-                      // alignment: Alignment.centerRight,
-                      activeIcon: SvgPicture.asset(
-                        "assets/icons/library_active.svg",
-                        color: MyStyle().white,
-                      ),
-                      inactiveIcon: SvgPicture.asset(
-                        "assets/icons/library.svg",
-                        color: MyStyle().white,
-                      ),
-                      text: "Library",
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        )
-        : DesktopScaffold();
-  }
-
-  Widget buildDesktopNavigationBar() {
-    return AnimatedContainer(
-      duration: Duration(milliseconds: 300),
-      width: isExpanded ? screenWidth * 0.17 : screenWidth * 0.045, // ปรับขนาด
-      color: MyStyle().dark,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [buildExpanded()],
-      ),
+        );
+      },
     );
   }
 
-  Widget buildExpanded() {
-    return isExpanded
-        ? Navigation_button()
-        : Expanded(
-          flex: 2,
-          child: ListView(
+  Widget buildTabletNavigationBar() {
+    return Container(
+      padding: EdgeInsets.only(
+        left: screenWidth * 0.1,
+        right: screenWidth * 0.1,
+      ),
+      height: screenHeight * 0.0839,
+      decoration: BoxDecoration(
+        color: MyStyle().dark,
+        border: Border(top: BorderSide(width: 1.5, color: MyStyle().grey)),
+        boxShadow: [
+          BoxShadow(color: MyStyle().grey, blurRadius: 2, spreadRadius: 1),
+        ],
+      ),
+      child: Scaffold(
+        body: Container(
+          margin: EdgeInsets.only(
+            top: screenHeight * 0.009,
+            left: screenWidth * 0.1,
+            right: screenWidth * 0.1,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              NavigationButtonDesktop(
-                onTap: () => onChangeTab(0),
-                isActive: tabIndex == 0,
-                isExpanded: true,
-                alignment: Alignment.centerLeft,
-                activeIcon: SvgPicture.asset(
-                  "assets/icons/home_active.svg",
-                  color: MyStyle().white,
+              Expanded(
+                flex: 3,
+                child: NavigationButton(
+                  onTap: () => onChangeTab(0),
+                  isActive: tabIndex == 0,
+                  alignment: Alignment.centerLeft,
+                  activeIcon: SvgPicture.asset(
+                    "assets/icons/home_active.svg",
+                    color: MyStyle().white,
+                  ),
+                  inactiveIcon: SvgPicture.asset(
+                    "assets/icons/home.svg",
+                    color: MyStyle().white,
+                  ),
+                  text: "Home",
                 ),
-                inactiveIcon: SvgPicture.asset(
-                  "assets/icons/home.svg",
-                  color: MyStyle().white,
-                ),
-                text: "Home",
               ),
-              NavigationButtonDesktop(
-                onTap: () => onChangeTab(1),
-                isActive: tabIndex == 1,
-                isExpanded: true,
-
-                activeIcon: SvgPicture.asset(
-                  "assets/icons/short_active.svg",
-                  color: MyStyle().white,
+              Expanded(
+                flex: 3,
+                child: NavigationButton(
+                  onTap: () => onChangeTab(1),
+                  isActive: tabIndex == 1,
+                  // alignment: Alignment.centerLeft,
+                  activeIcon: SvgPicture.asset(
+                    "assets/icons/short_active.svg",
+                    color: MyStyle().white,
+                  ),
+                  inactiveIcon: SvgPicture.asset(
+                    "assets/icons/short.svg",
+                    color: MyStyle().white,
+                  ),
+                  text: "Short",
                 ),
-                inactiveIcon: SvgPicture.asset(
-                  "assets/icons/short.svg",
-                  color: MyStyle().white,
-                ),
-                text: "Short",
               ),
-              NavigationButtonDesktop(
-                onTap: () => onChangeTab(2),
-                isActive: tabIndex == 2,
-                isExpanded: true,
-                alignment: Alignment.centerRight,
-                activeIcon: SvgPicture.asset(
-                  "assets/icons/subscription_active.svg",
-                  color: MyStyle().white,
+              Expanded(
+                flex: 3,
+                child: IconButton(
+                  onPressed: onTabCreate,
+                  padding: EdgeInsets.all(2),
+                  icon: SvgPicture.asset(
+                    "assets/icons/add.svg",
+                    color: MyStyle().white,
+                    height: 40,
+                  ),
                 ),
-                inactiveIcon: SvgPicture.asset(
-                  "assets/icons/subscription.svg",
-                  color: MyStyle().white,
-                ),
-                text: "Sub",
               ),
-              NavigationButtonDesktop(
-                onTap: () => onChangeTab(3),
-                isActive: tabIndex == 3,
-                isExpanded: true,
-                activeIcon: SvgPicture.asset(
-                  "assets/icons/library_active.svg",
-                  color: MyStyle().white,
+              Expanded(
+                flex: 3,
+                child: NavigationButton(
+                  onTap: () => onChangeTab(2),
+                  isActive: tabIndex == 2,
+                  alignment: Alignment.centerRight,
+                  activeIcon: SvgPicture.asset(
+                    "assets/icons/subscription_active.svg",
+                    color: MyStyle().white,
+                  ),
+                  inactiveIcon: SvgPicture.asset(
+                    "assets/icons/subscription.svg",
+                    color: MyStyle().white,
+                  ),
+                  text: "Sub",
                 ),
-                inactiveIcon: SvgPicture.asset(
-                  "assets/icons/library.svg",
-                  color: MyStyle().white,
+              ),
+              Expanded(
+                flex: 3,
+                child: NavigationButton(
+                  onTap: () => onChangeTab(3),
+                  isActive: tabIndex == 3,
+                  // alignment: Alignment.centerRight,
+                  activeIcon: SvgPicture.asset(
+                    "assets/icons/library_active.svg",
+                    color: MyStyle().white,
+                  ),
+                  inactiveIcon: SvgPicture.asset(
+                    "assets/icons/library.svg",
+                    color: MyStyle().white,
+                  ),
+                  text: "Library",
                 ),
-                text: "Library",
               ),
             ],
           ),
-        );
+        ),
+      ),
+    );
   }
 
   onTabCreate() {
@@ -464,10 +320,6 @@ class _NaviScreenState extends State<NaviScreen> {
     backgroundColor: MyStyle().grey,
     child: ListView(
       children: [
-        // DrawerHeader(
-        //   // decoration: BoxDecoration(color: Colors.blue),
-        //   child: SvgPicture.asset("assets/icons/logo.svg"),
-        // ),
         ListTile(
           title: Row(children: [SvgPicture.asset("assets/icons/logo.svg")]),
 
@@ -486,7 +338,10 @@ class _NaviScreenState extends State<NaviScreen> {
           ),
 
           onTap: () {
-            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const TrendingScreen()),
+            );
           },
         ),
         ListTile(
@@ -499,7 +354,10 @@ class _NaviScreenState extends State<NaviScreen> {
           ),
 
           onTap: () {
-            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const MusicScreen()),
+            );
           },
         ),
         ListTile(
@@ -512,7 +370,10 @@ class _NaviScreenState extends State<NaviScreen> {
           ),
 
           onTap: () {
-            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const GamingScreen()),
+            );
           },
         ),
         ListTile(
@@ -525,7 +386,10 @@ class _NaviScreenState extends State<NaviScreen> {
           ),
 
           onTap: () {
-            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const NewsScreen()),
+            );
           },
         ),
         ListTile(
@@ -538,14 +402,23 @@ class _NaviScreenState extends State<NaviScreen> {
           ),
 
           onTap: () {
-            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SportScreen()),
+            );
           },
         ),
         Divider(thickness: 1, color: MyStyle().white),
         ListTile(
           title: Row(
             children: [
-              SvgPicture.asset("assets/icons/youtube_studio.svg"),
+              CircleAvatar(
+                radius: screenHeight * 0.013,
+                backgroundColor: MyStyle().grey,
+               child:  SvgPicture.asset("assets/icons/youtube_studio.svg"),
+              ),
+
+              // SvgPicture.asset("assets/icons/youtube_studio.svg"),
               SizedBox(width: 10),
               Text('Youtube Studio'),
             ],
@@ -558,7 +431,11 @@ class _NaviScreenState extends State<NaviScreen> {
         ListTile(
           title: Row(
             children: [
-              SvgPicture.asset("assets/icons/youtube_music.svg"),
+              CircleAvatar(
+                radius: screenHeight * 0.009,
+                backgroundImage: AssetImage("assets/icons/youtube_music.png"),
+              ),
+
               SizedBox(width: 10),
               Text('Youtube Music'),
             ],

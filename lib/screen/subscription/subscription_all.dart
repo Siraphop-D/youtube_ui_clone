@@ -112,8 +112,8 @@ class _SubscriptionAllState extends State<SubscriptionAll> {
                       child: ListTile(
                         contentPadding: EdgeInsets.zero, // ให้ชิดขอบซ้ายขวา
                         leading: CircleAvatar(
-                          backgroundImage: NetworkImage(
-                            channel[index]["channelProfileUrl"]!,
+                          backgroundImage: AssetImage(
+                            channel[index]["channelProfile"]!,
                           ),
                         ),
                         title: Text(channel[index]["channelName"]!),

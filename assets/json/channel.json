@@ -1,97 +1,62 @@
 [
     {
         "channelID":"1",
-        "channelProfileUrl": "https://i.scdn.co/image/ab6761610000e5eb5fe9a5af0233790d764583dd",
-        "channelName": "ch1"
+        "channelProfile": "assets/channelprofile/1.jpg",
+        "channelName": "Charlie Puth"
     },
     {
         "channelID":"2",
-        "channelProfileUrl": "https://yt3.ggpht.com/ytc/AMLnZu9IIpSHbPejMDtBrI288dyVEXrhshrpwAkvVHIfow=s176-c-k-c0x00ffffff-no-rj",
-        "channelName": "ch2"
+        "channelProfile": "assets/channelprofile/2.jpg",
+        "channelName": "TheghostradioOffic"
     },
     {
         "channelID":"3",
-        "channelProfileUrl": "https://i.scdn.co/image/ab6761610000e5eb5fe9a5af0233790d764583dd",
-        "channelName": "ch3"
+        "channelProfile": "assets/channelprofile/3.jpg",
+        "channelName": "GoodDayOfficial"
     },
     {
         "channelID":"4",
-        "channelProfileUrl": "https://yt3.ggpht.com/ytc/AMLnZu9IIpSHbPejMDtBrI288dyVEXrhshrpwAkvVHIfow=s176-c-k-c0x00ffffff-no-rj",
-        "channelName": "ch4"
+        "channelProfile": "assets/channelprofile/4.jpg",
+        "channelName": "My Mate Nate"
     },
     {
         "channelID":"5",
-        "channelProfileUrl": "https://yt3.ggpht.com/ytc/AMLnZu9IIpSHbPejMDtBrI288dyVEXrhshrpwAkvVHIfow=s176-c-k-c0x00ffffff-no-rj",
-        "channelName": "ch5"
+        "channelProfile": "assets/channelprofile/5.jpg",
+        "channelName": "Bow Kanyarat"
     },
     {
         "channelID":"6",
-        "channelProfileUrl": "https://yt3.ggpht.com/ytc/AMLnZu9IIpSHbPejMDtBrI288dyVEXrhshrpwAkvVHIfow=s176-c-k-c0x00ffffff-no-rj",
-        "channelName": "Ch6"
+        "channelProfile": "assets/channelprofile/6.jpg",
+        "channelName": "Patiphan Phengpao"
     },
     {
         "channelID":"7",
-        "channelProfileUrl": "https://yt3.ggpht.com/ytc/AMLnZu9IIpSHbPejMDtBrI288dyVEXrhshrpwAkvVHIfow=s176-c-k-c0x00ffffff-no-rj",
-        "channelName": "ch7"
+        "channelProfile": "assets/channelprofile/7.jpg",
+        "channelName": "BorntoDev"
     },
     {
         "channelID":"8",
-        "channelProfileUrl": "https://yt3.ggpht.com/ytc/AMLnZu9IIpSHbPejMDtBrI288dyVEXrhshrpwAkvVHIfow=s176-c-k-c0x00ffffff-no-rj",
-        "channelName": "ch8"
+        "channelProfile": "assets/channelprofile/8.jpg",
+        "channelName": "เทพลีลา"
     },
     {
         "channelID":"9",
-        "channelProfileUrl": "https://i.scdn.co/image/ab6761610000e5eb5fe9a5af0233790d764583dd",
-        "channelName": "ch9"
+        "channelProfile": "assets/channelprofile/9.jpg",
+        "channelName": "StepGeekTV Online"
     },
     {
         "channelID":"10",
-        "channelProfileUrl": "https://yt3.ggpht.com/ytc/AMLnZu9IIpSHbPejMDtBrI288dyVEXrhshrpwAkvVHIfow=s176-c-k-c0x00ffffff-no-rj",
-        "channelName": "ch10"
+        "channelProfile": "assets/channelprofile/10.jpg",
+        "channelName": "GU ZAP"
     },
     {
         "channelID":"11",
-        "channelProfileUrl": "https://yt3.ggpht.com/ytc/AMLnZu9IIpSHbPejMDtBrI288dyVEXrhshrpwAkvVHIfow=s176-c-k-c0x00ffffff-no-rj",
-        "channelName": "ch11"
+        "channelProfile": "assets/channelprofile/11.jpg",
+        "channelName": "The Driver"
     },
     {
         "channelID":"12",
-        "channelProfileUrl": "https://yt3.ggpht.com/ytc/AMLnZu9IIpSHbPejMDtBrI288dyVEXrhshrpwAkvVHIfow=s176-c-k-c0x00ffffff-no-rj",
-        "channelName": "Ch12"
-    },
-    {
-        "channelID":"13",
-        "channelProfileUrl": "https://yt3.ggpht.com/ytc/AMLnZu9IIpSHbPejMDtBrI288dyVEXrhshrpwAkvVHIfow=s176-c-k-c0x00ffffff-no-rj",
-        "channelName": "ch13"
-    },
-    {
-        "channelID":"14",
-        "channelProfileUrl": "https://yt3.ggpht.com/ytc/AMLnZu9IIpSHbPejMDtBrI288dyVEXrhshrpwAkvVHIfow=s176-c-k-c0x00ffffff-no-rj",
-        "channelName": "ch14"
-    },
-    {
-        "channelID":"15",
-        "channelProfileUrl": "https://i.scdn.co/image/ab6761610000e5eb5fe9a5af0233790d764583dd",
-        "channelName": "ch15"
-    },
-    {
-        "channelID":"16",
-        "channelProfileUrl": "https://yt3.ggpht.com/ytc/AMLnZu9IIpSHbPejMDtBrI288dyVEXrhshrpwAkvVHIfow=s176-c-k-c0x00ffffff-no-rj",
-        "channelName": "ch16"
-    },
-    {
-        "channelID":"17",
-        "channelProfileUrl": "https://yt3.ggpht.com/ytc/AMLnZu9IIpSHbPejMDtBrI288dyVEXrhshrpwAkvVHIfow=s176-c-k-c0x00ffffff-no-rj",
-        "channelName": "ch17"
-    },
-    {
-        "channelID":"18",
-        "channelProfileUrl": "https://yt3.ggpht.com/ytc/AMLnZu9IIpSHbPejMDtBrI288dyVEXrhshrpwAkvVHIfow=s176-c-k-c0x00ffffff-no-rj",
-        "channelName": "Ch18"
-    },
-    {
-        "channelID":"19",
-        "channelProfileUrl": "https://yt3.ggpht.com/ytc/AMLnZu9IIpSHbPejMDtBrI288dyVEXrhshrpwAkvVHIfow=s176-c-k-c0x00ffffff-no-rj",
-        "channelName": "ch19"
+        "channelProfile": "assets/channelprofile/12.jpg",
+        "channelName": "Ananped"
     }
 ]

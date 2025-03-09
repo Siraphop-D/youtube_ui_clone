@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="youtube_ui_clone"
+        android:label="YouTube"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
