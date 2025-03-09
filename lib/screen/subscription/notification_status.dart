@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-enum NotificationStatus {all, personalized, none} //สถานะแจ้งเตือน
+enum NotificationStatus {all, personalized, none} //กำหนดสถานะแจ้งเตือน
 
 abstract class NotificationEvent extends Equatable{
   const NotificationEvent();

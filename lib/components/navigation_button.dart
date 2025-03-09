@@ -22,8 +22,7 @@ class NavigationButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    late double screenWidth, screenHeight;
-    screenWidth = MediaQuery.of(context).size.width;
+    late double screenHeight;
     screenHeight = MediaQuery.of(context).size.height;
     return ResponsiveLayout.isMobile(context)
         ? IconButton(

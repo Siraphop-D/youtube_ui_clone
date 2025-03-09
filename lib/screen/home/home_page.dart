@@ -7,11 +7,11 @@ import 'package:line_icons/line_icons.dart';
 import 'package:youtube_ui_clone/components/custom_listtile.dart';
 import 'package:youtube_ui_clone/components/video_card.dart';
 import 'package:youtube_ui_clone/item/category_item.dart';
-import 'package:youtube_ui_clone/responsive/desktop_scaffold.dart';
 import 'package:youtube_ui_clone/responsive/responsive_layout.dart';
 import 'package:youtube_ui_clone/screen/naviscreen/navi_screen.dart';
 import 'package:youtube_ui_clone/screen/notification/notification_screen.dart';
 import 'package:youtube_ui_clone/screen/search/search_screen.dart';
+import 'package:youtube_ui_clone/screen/videoplayer/videoplayer_screen.dart';
 import 'package:youtube_ui_clone/utility/my_style.dart';
 
 class HomePage extends StatefulWidget {
@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
   int categoryIndex = 0;
   List<dynamic> videos = [];
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
+  late bool isPortrait;
   @override
   void initState() {
     super.initState();
@@ -37,55 +37,49 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
+    isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return Scaffold(
       key: _scaffoldKey,
-      body:
-          !ResponsiveLayout.isDesktop(context)
-              ? CustomScrollView(
-                slivers: [
-                  SliverAppBar(
-                    expandedHeight: 50.0,
-                    automaticallyImplyLeading: false,
-                    title: SvgPicture.asset("assets/icons/logo.svg"),
-                    actions: [
-                      IconButton(
-                        onPressed: onTabCast,
-                        splashRadius: 25,
-                        icon: Icon(Icons.cast),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 50.0,
+            automaticallyImplyLeading: false,
+            title: SvgPicture.asset("assets/icons/logo.svg"),
+            actions: [
+              IconButton(
+                onPressed: onTabCast,
+                splashRadius: 25,
+                icon: Icon(Icons.cast),
+              ),
+              IconButton(
+                onPressed:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NotificationScreen(),
                       ),
-                      IconButton(
-                        onPressed:
-                            () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => NotificationScreen(),
-                              ),
-                            ),
-
-                        splashRadius: 25,
-                        icon: Icon(Icons.notifications_outlined),
-                      ),
-                      IconButton(
-                        onPressed:
-                            () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SearchScreen(),
-                              ),
-                            ),
-                        splashRadius: 25,
-                        icon: Icon(Icons.search),
-                      ),
-                    ],
-                  ),
-                  SliverToBoxAdapter(
-                    child: Column(
-                      children: [buildCategory(), buildVideoSection()],
                     ),
-                  ),
-                ],
-              )
-              : DesktopScaffold(),
+
+                splashRadius: 25,
+                icon: Icon(Icons.notifications_outlined),
+              ),
+              IconButton(
+                onPressed:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SearchScreen()),
+                    ),
+                splashRadius: 25,
+                icon: Icon(Icons.search),
+              ),
+            ],
+          ),
+          SliverToBoxAdapter(
+            child: Column(children: [buildCategory(), buildVideoSection()]),
+          ),
+        ],
+      ),
     );
   }
 
@@ -179,15 +173,32 @@ class _HomePageState extends State<HomePage> {
         ? Column(
           children: List.generate(videos.length, (index) {
             return VideoCard(
-              onTap: () {},
-              // => Navigator.push(context, MaterialPageRoute(builder: (_) => DetailPage())),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) => VideoPlayerScreen(
+                          videoUrl: videos[index]['videoUrl'],
+                              duration: videos[index]['duration'],
+                              title: videos[index]['title'],
+                              channelProfile: videos[index]['channelProfile'],
+                              channelName: videos[index]['channelName'],
+                              view: videos[index]['view'],
+                              dateTime: videos[index]['dateTime'],
+                              thumbnail: videos[index]['thumbnail'],
+                        ),
+                  ),
+                );
+              },
               videoUrl: videos[index]['videoUrl'],
               duration: videos[index]['duration'],
               title: videos[index]['title'],
-              channelProfileUrl: videos[index]['channelProfileUrl'],
+              channelProfile: videos[index]['channelProfile'],
               channelName: videos[index]['channelName'],
               view: videos[index]['view'],
               dateTime: videos[index]['dateTime'],
+              thumbnail: videos[index]['thumbnail'],
             );
           }),
         )
@@ -211,24 +222,43 @@ class _HomePageState extends State<HomePage> {
                                 mainAxisSpacing: 20,
                                 mainAxisExtent:
                                     constrains.maxWidth > 900
-                                        ? screenHeight * 0.435
+                                        ? isPortrait
+                                            ? screenHeight * 0.25
+                                            : screenHeight * 0.41
                                         : screenHeight * 0.3,
                                 childAspectRatio: 16 / 9,
                               ),
                           itemCount: videos.length,
                           itemBuilder: (context, index) {
                             return VideoCard(
-                              onTap: () {},
-                              // => Navigator.push(context, MaterialPageRoute(builder: (_) => DetailPage())),
-                              videoUrl: videos[index]['videoUrl'] ?? '',
-                              duration: videos[index]['duration'] ?? '',
-                              title: videos[index]['title'] ?? 'No Title',
-                              channelProfileUrl:
-                                  videos[index]['channelProfileUrl'] ?? '',
-                              channelName:
-                                  videos[index]['channelName'] ?? 'Unknow',
-                              view: videos[index]['view'] ?? '0 views',
-                              dateTime: videos[index]['dateTime'] ?? 'Unknow',
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => VideoPlayerScreen(
+                                          videoUrl: videos[index]['videoUrl'],
+                                          duration: videos[index]['duration'],
+                                          title: videos[index]['title'],
+                                          channelProfile:
+                                              videos[index]['channelProfile'],
+                                          channelName:
+                                              videos[index]['channelName'],
+                                          view: videos[index]['view'],
+                                          dateTime: videos[index]['dateTime'],
+                                          thumbnail: videos[index]['thumbnail'],
+                                        ),
+                                  ),
+                                );
+                              },
+                              videoUrl: videos[index]['videoUrl'],
+                              duration: videos[index]['duration'],
+                              title: videos[index]['title'],
+                              channelProfile: videos[index]['channelProfile'],
+                              channelName: videos[index]['channelName'],
+                              view: videos[index]['view'],
+                              dateTime: videos[index]['dateTime'],
+                              thumbnail: videos[index]['thumbnail'],
                             );
                           },
                         ),

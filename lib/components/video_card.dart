@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:youtube_ui_clone/responsive/responsive_layout.dart';
 import 'package:youtube_ui_clone/utility/my_style.dart';
 
 class VideoCard extends StatelessWidget {
-  final String videoUrl, duration, title;
-  final String channelProfileUrl, channelName, view, dateTime;
+  final String videoUrl, duration, title, thumbnail;
+  final String channelProfile, channelName, view, dateTime;
   final VoidCallback onTap;
 
   const VideoCard({
@@ -13,31 +12,25 @@ class VideoCard extends StatelessWidget {
     required this.videoUrl,
     required this.duration,
     required this.title,
-    required this.channelProfileUrl,
+    required this.channelProfile,
     required this.channelName,
     required this.view,
     required this.dateTime,
     required this.onTap,
+    required this.thumbnail,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth > 1200) {
-          return buildDesktopCard(); // 🖥️ Desktop
-        } else if (constraints.maxWidth > 800) {
-          return buildTabletCard(); // 📱 Tablet
+        if (constraints.maxWidth > 800) {
+          return buildTabletCard(); // Tablet
         } else {
-          return buildMobileCard(); // 📱 Mobile
+          return buildMobileCard(); // Mobile
         }
       },
     );
-    // ResponsiveLayout.isMobile(context)
-    //     ? buildMobileCard()
-    //     : buildTabletCard();
-
-    ///ต้องสร้างเป็นdesktop
   }
 
   Widget buildMobileCard() {
@@ -51,7 +44,7 @@ class VideoCard extends StatelessWidget {
                 height: 220,
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: NetworkImage(videoUrl),
+                    image: AssetImage(thumbnail),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -84,7 +77,7 @@ class VideoCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 20,
-                  backgroundImage: NetworkImage(channelProfileUrl),
+                  backgroundImage: AssetImage(channelProfile),
                 ),
                 SizedBox(width: MyStyle().defaultSPadding),
                 Expanded(
@@ -119,8 +112,7 @@ class VideoCard extends StatelessWidget {
   }
 
   InkWell buildTabletCard() {
-    return 
-     InkWell(
+    return InkWell(
       onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,7 +133,7 @@ class VideoCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundImage: NetworkImage(channelProfileUrl),
+                backgroundImage: AssetImage(channelProfile),
               ),
               SizedBox(width: 10),
               Expanded(
@@ -192,7 +184,7 @@ class VideoCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 24,
-                backgroundImage: NetworkImage(channelProfileUrl),
+                backgroundImage: AssetImage(channelProfile),
               ),
               SizedBox(width: 10),
               Expanded(
@@ -203,7 +195,10 @@ class VideoCard extends StatelessWidget {
                       title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     SizedBox(height: 4),
                     Text(
@@ -220,5 +215,3 @@ class VideoCard extends StatelessWidget {
     );
   }
 }
-
-

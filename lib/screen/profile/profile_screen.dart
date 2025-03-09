@@ -1,14 +1,19 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:youtube_ui_clone/components/custom_listtile.dart';
 import 'package:youtube_ui_clone/item/category_item.dart';
+import 'package:youtube_ui_clone/responsive/responsive_layout.dart';
 import 'package:youtube_ui_clone/screen/notification/notification_screen.dart';
 import 'package:youtube_ui_clone/screen/search/search_screen.dart';
+import 'package:youtube_ui_clone/screen/videoplayer/videoplayer_screen.dart';
 import 'package:youtube_ui_clone/utility/my_style.dart';
 
 class ProfileScreen extends StatefulWidget {
-  final VoidCallback onNavigate;
-  const ProfileScreen({Key? key, required this.onNavigate}) : super(key: key);
+  final GlobalKey<NavigatorState> navigatorKey;
+  const ProfileScreen({Key? key, required this.navigatorKey}) : super(key: key);
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -18,10 +23,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late double screenWidth, screenHeight;
   int profileIndex = 0;
   int settindIndex = 0;
+  List<dynamic> videos = [];
+  late bool isPortrait;
+
+  @override
+  void initState() {
+    super.initState();
+    loadJsonData();
+  }
+
+  Future<void> loadJsonData() async {
+    String jsonString = await rootBundle.loadString('assets/json/video.json');
+    setState(() {
+      videos = jsonDecode(jsonString);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
+    isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -63,11 +85,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: EdgeInsets.symmetric(
                 horizontal: MyStyle().defaultLPadding,
               ),
-              child: buildProfile(),
+              child: buildProfile(widget.navigatorKey),
             ),
             buildCategory(),
-            buildHistory(),
-            buildPlaylist(),
+            buildHistory(widget.navigatorKey),
+            buildPlaylist(widget.navigatorKey),
             buildMenuItem(Icons.video_library, "Your videos"),
             buildMenuItem(Icons.download, "Downloads"),
             Divider(thickness: 1, color: MyStyle().lightGrey),
@@ -81,16 +103,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  buildHistory() {
+  buildHistory(GlobalKey<NavigatorState> navigatorKey) {
     return Column(
       children: [
         InkWell(
-          onTap: () {},
+          onTap: () {
+            navigatorKey.currentState!.pushNamed('/history_all');
+          },
           child: ListTile(
             title: Text(
               "History",
               style: TextStyle(
-                fontSize: screenHeight * 0.019,
+                fontSize: screenHeight * 0.016,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -111,32 +135,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ),
-        Container(
-          width: screenWidth,
-          height: screenHeight * 0.15,
-          color: MyStyle().grey,
-        ),
+        buildHistorySection(),
       ],
     );
   }
 
-  buildPlaylist() {
+  buildPlaylist(GlobalKey<NavigatorState> navigatorKey) {
     return Column(
       children: [
         InkWell(
-          onTap: () {},
+          onTap: () {
+            navigatorKey.currentState!.pushNamed('/playlist_all');
+          },
           child: ListTile(
             title: Text(
               "Playlists",
               style: TextStyle(
-                fontSize: screenHeight * 0.019,
+                fontSize: screenHeight * 0.016,
                 fontWeight: FontWeight.bold,
               ),
             ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                IconButton(onPressed: () {}, icon: Icon(Icons.add)),
+                IconButton(
+                  onPressed: () => showCreatePlaylistDialog(),
+                  icon: Icon(Icons.add),
+                ),
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(25),
@@ -156,12 +181,132 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ),
-        Container(
-          width: screenWidth,
-          height: screenHeight * 0.15,
-          color: MyStyle().grey,
-        ),
+        buildHistorySection()
       ],
+    );
+  }
+
+  showCreatePlaylistDialog() {
+    TextEditingController titleController = TextEditingController();
+    String visibility = "Private";
+    bool isCollaborate = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: MyStyle().grey,
+              content: SizedBox(
+                width: screenWidth * 0.89,
+                height: screenHeight * 0.32,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "New playlist",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    TextField(
+                      controller: titleController,
+                      decoration: InputDecoration(
+                        labelText: "Title",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      value: visibility,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      items:
+                          ["Public", "Private", "Unlisted"].map((
+                            String option,
+                          ) {
+                            return DropdownMenuItem(
+                              value: option,
+                              child: Text(option),
+                            );
+                          }).toList(),
+                      onChanged: (value) {
+                        setState(() => visibility = value!);
+                      },
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Collaborate"),
+                        Switch(
+                          activeColor: MyStyle().dark,
+                          activeTrackColor: MyStyle().white,
+                          inactiveTrackColor: MyStyle().lightGrey,
+                          inactiveThumbColor: MyStyle().dark,
+                          value: isCollaborate,
+                          onChanged: (value) {
+                            setState(() => isCollaborate = value);
+                          },
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: MyStyle().white,
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                          child: Text("Cancel", style: TextStyle(fontSize: 16)),
+                        ),
+                        SizedBox(width: screenWidth * 0.015),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: MyStyle().lightGrey,
+                            foregroundColor: MyStyle().white,
+                          ),
+                          onPressed:
+                              titleController.text.isEmpty
+                                  ? null
+                                  : () {
+                                    // Save action here
+                                    Navigator.pop(context);
+                                  },
+                          child: Text(
+                            "Create",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: MyStyle().dark,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -170,14 +315,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       leading: Icon(icon, color: iconColor, size: screenHeight * 0.03),
       title: Text(
         title,
-        style: TextStyle(fontSize: screenHeight * 0.018, color: iconColor),
+        style: TextStyle(fontSize: screenHeight * 0.014, color: iconColor),
       ),
     );
   }
 
-  buildProfile() {
+  buildProfile(GlobalKey<NavigatorState> navigatorKey) {
     return InkWell(
-      onTap: widget.onNavigate,
+      onTap: () {
+        navigatorKey.currentState!.pushNamed('/myprofile');
+      }, /////
       child: Row(
         children: [
           CircleAvatar(
@@ -192,7 +339,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 'Name P',
                 style: TextStyle(
                   color: MyStyle().white,
-                  fontSize: screenHeight * 0.02,
+                  fontSize: screenHeight * 0.018,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -217,6 +364,113 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget buildHistorySection() {
+    return Container(
+      width: double.infinity,
+      height:
+          ResponsiveLayout.isMobile(context)
+              ? isPortrait
+                  ? screenHeight * 0.29
+                  : screenHeight * 0.8
+              : isPortrait
+              ? screenHeight * 0.28
+              : screenHeight * 0.42,
+
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: videos.length,
+        itemBuilder: (context, index) {
+          return InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (context) => VideoPlayerScreen(
+                        videoUrl: videos[index]['videoUrl'],
+                        duration: videos[index]['duration'],
+                        title: videos[index]['title'],
+                        channelProfile: videos[index]['channelProfile'],
+                        channelName: videos[index]['channelName'],
+                        view: videos[index]['view'],
+                        dateTime: videos[index]['dateTime'],
+                        thumbnail: videos[index]['thumbnail'],
+                      ),
+                ),
+              );
+            },
+            child: Padding(
+              padding: EdgeInsets.only(left: 5),
+              child: Container(
+                width:
+                    ResponsiveLayout.isMobile(context)
+                        ? isPortrait
+                            ? screenWidth * 0.6
+                            : screenWidth * 0.4
+                        : isPortrait
+                        ? screenWidth * 0.502
+                        : screenWidth * 0.352,
+                height:
+                    ResponsiveLayout.isMobile(context)
+                        ? isPortrait
+                            ? screenHeight * 0.17
+                            : screenHeight * 0.3
+                        : isPortrait
+                        ? screenHeight * 0.2
+                        : screenHeight * 0.45,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width:
+                          ResponsiveLayout.isMobile(context)
+                              ? isPortrait
+                                  ? screenWidth * 0.6
+                                  : screenWidth * 0.359
+                              : isPortrait
+                              ? screenWidth * 0.5
+                              : screenWidth * 0.35,
+                      height:
+                          ResponsiveLayout.isMobile(context)
+                              ? isPortrait
+                                  ? screenHeight * 0.16
+                                  : screenHeight * 0.359
+                              : isPortrait
+                              ? screenHeight * 0.2
+                              : screenHeight * 0.3,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage(videos[index]['thumbnail']),
+                          fit: BoxFit.cover,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      videos[index]['title'],
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: Colors.white, fontSize: 14),
+                    ),
+                    Text(
+                      "${videos[index]['channelName']}",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                    Text(
+                      "${videos[index]['view']}",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -268,7 +522,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Text(
                         profileItems[index]["title"],
                         style: TextStyle(
-                          fontSize: screenHeight*0.014,
+                          fontSize: screenHeight * 0.014,
                           color:
                               profileIndex == index
                                   ? MyStyle().black
@@ -347,15 +601,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       isScrollControlled: true, // ให้ BottomSheet ปรับขนาดตามเนื้อหา
       builder: (BuildContext context) {
         return FractionallySizedBox(
-          heightFactor: 0.98, // จำกัดความสูง
+          heightFactor: 0.98, 
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: MyStyle().defaultPadding),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(height: MyStyle().defaultSPadding),
-
-                // Header (ปุ่ม Close + ชื่อ "Settings")
                 Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: MyStyle().defaultPadding,
@@ -372,13 +624,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
 
                 SizedBox(height: MyStyle().defaultSPadding),
-
-                // ใช้ Expanded + ListView.separated แทน Column
                 Expanded(
                   child: ListView.separated(
                     itemCount: settingsItems.length,
                     separatorBuilder: (context, index) {
-                      // เงื่อนไขเพิ่มข้อความคั่น (กรณีเพิ่มหมวดหมู่)
+    
 
                       if (index == 9) {
                         return Padding(
@@ -391,7 +641,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             children: [
                               Divider(color: Colors.white.withOpacity(0.1)),
                               Text(
-                                "Video and audio preferrences", // ข้อความหัวข้อคั่น
+                                "Video and audio preferrences", 
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -412,7 +662,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             children: [
                               Divider(color: Colors.white.withOpacity(0.1)),
                               Text(
-                                "Help and policies", // ข้อความหัวข้อคั่น
+                                "Help and policies", 
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -427,7 +677,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                     itemBuilder: (context, index) {
                       return CustomListTile(
-                        onTap: () {},
+                        onTap:
+                            () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => settingsItems[index]['onTap'],
+                              ),
+                            ),
+
                         leadingIcon: settingsItems[index]['icon'],
                         title: settingsItems[index]['title'],
                       );

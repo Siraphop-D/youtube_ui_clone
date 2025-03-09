@@ -8,8 +8,10 @@ import 'package:youtube_ui_clone/components/custom_listtile.dart';
 import 'package:youtube_ui_clone/components/video_card.dart';
 import 'package:youtube_ui_clone/item/category_item.dart';
 import 'package:youtube_ui_clone/item/setting_item.dart';
+import 'package:youtube_ui_clone/responsive/responsive_layout.dart';
 import 'package:youtube_ui_clone/screen/notification/notification_screen.dart';
 import 'package:youtube_ui_clone/screen/search/search_screen.dart';
+import 'package:youtube_ui_clone/screen/videoplayer/videoplayer_screen.dart';
 import 'package:youtube_ui_clone/utility/my_style.dart';
 
 class SubscriptionScreen extends StatefulWidget {
@@ -22,6 +24,7 @@ class SubscriptionScreen extends StatefulWidget {
 }
 
 class _SubscriptionScreenState extends State<SubscriptionScreen> {
+  late bool isPortrait;
   late double screenWidth, screenHeight;
   int subscriptionIndex = 0;
   int channelIndex = 0;
@@ -40,6 +43,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
+    isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -108,21 +112,104 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 
   Widget buildVideoSection() {
-    return Column(
-      children: List.generate(videos.length, (index) {
-        return VideoCard(
-          onTap: () {},
-          // => Navigator.push(context, MaterialPageRoute(builder: (_) => DetailPage())),
-          videoUrl: videos[index]['videoUrl'],
-          duration: videos[index]['duration'],
-          title: videos[index]['title'],
-          channelProfileUrl: videos[index]['channelProfileUrl'],
-          channelName: videos[index]['channelName'],
-          view: videos[index]['view'],
-          dateTime: videos[index]['dateTime'],
+    return ResponsiveLayout.isMobile(context)
+        ? Column(
+          children: List.generate(videos.length, (index) {
+            return VideoCard(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) => VideoPlayerScreen(
+                          videoUrl: videos[index]['videoUrl'],
+                          duration: videos[index]['duration'],
+                          title: videos[index]['title'],
+                          channelProfile: videos[index]['channelProfile'],
+                          channelName: videos[index]['channelName'],
+                          view: videos[index]['view'],
+                          dateTime: videos[index]['dateTime'],
+                          thumbnail: videos[index]['thumbnail'],
+                        ),
+                  ),
+                );
+              },
+              videoUrl: videos[index]['videoUrl'],
+              duration: videos[index]['duration'],
+              title: videos[index]['title'],
+              channelProfile: videos[index]['channelProfile'],
+              channelName: videos[index]['channelName'],
+              view: videos[index]['view'],
+              dateTime: videos[index]['dateTime'],
+              thumbnail: videos[index]['thumbnail'],
+            );
+          }),
+        )
+        : LayoutBuilder(
+          builder: (context, constrains) {
+            int crossAxisCount = constrains.maxWidth > 900 ? 3 : 2;
+            return Padding(
+              padding: EdgeInsets.all(8),
+              child:
+                  videos != null &&
+                          videos
+                              .isNotEmpty // เช็คว่า videos มีค่า
+                      ? Expanded(
+                        child: GridView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: crossAxisCount,
+                                crossAxisSpacing: 15,
+                                mainAxisSpacing: 20,
+                                mainAxisExtent:
+                                    constrains.maxWidth > 900
+                                        ? isPortrait
+                                            ? screenHeight * 0.25
+                                            : screenHeight * 0.41
+                                        : screenHeight * 0.3,
+                                childAspectRatio: 16 / 9,
+                              ),
+                          itemCount: videos.length,
+                          itemBuilder: (context, index) {
+                            return VideoCard(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => VideoPlayerScreen(
+                                          videoUrl: videos[index]['videoUrl'],
+                                          duration: videos[index]['duration'],
+                                          title: videos[index]['title'],
+                                          channelProfile:
+                                              videos[index]['channelProfile'],
+                                          channelName:
+                                              videos[index]['channelName'],
+                                          view: videos[index]['view'],
+                                          dateTime: videos[index]['dateTime'],
+                                          thumbnail: videos[index]['thumbnail'],
+                                        ),
+                                  ),
+                                );
+                              },
+                              videoUrl: videos[index]['videoUrl'],
+                              duration: videos[index]['duration'],
+                              title: videos[index]['title'],
+                              channelProfile: videos[index]['channelProfile'],
+                              channelName: videos[index]['channelName'],
+                              view: videos[index]['view'],
+                              dateTime: videos[index]['dateTime'],
+                              thumbnail: videos[index]['thumbnail'],
+                            );
+                          },
+                        ),
+                      )
+                      : Center(child: CircularProgressIndicator()),
+            );
+          },
         );
-      }),
-    );
   }
 
   Widget buildChannel() {
@@ -155,16 +242,21 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                               child: Column(
                                 children: [
                                   CircleAvatar(
-                                    backgroundImage: NetworkImage(
-                                      channel[index]['channelProfileUrl'],
+                                    backgroundImage: AssetImage(
+                                      channel[index]['channelProfile'],
                                     ),
                                     radius: screenHeight * 0.03,
                                   ),
                                   const SizedBox(height: 5),
-                                  Text(
-                                    channel[index]['channelName'],
-                                    style: GoogleFonts.roboto(
-                                      fontSize: screenHeight * 0.015,
+                                  SizedBox(
+                                    width: screenWidth*0.14,
+                                    child: Text(
+                                      channel[index]['channelName'],
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: GoogleFonts.roboto(
+                                        fontSize: screenHeight * 0.015,
+                                      ),
                                     ),
                                   ),
                                 ],

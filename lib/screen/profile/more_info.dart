@@ -6,8 +6,8 @@ import 'package:youtube_ui_clone/screen/search/search_screen.dart';
 import 'package:youtube_ui_clone/utility/my_style.dart';
 
 class MoreInfo extends StatefulWidget {
-  final VoidCallback onBack;
-  const MoreInfo({super.key, required this.onBack});
+
+  const MoreInfo({super.key});
 
   @override
   State<MoreInfo> createState() => _MoreInfoState();
@@ -26,7 +26,7 @@ class _MoreInfoState extends State<MoreInfo> {
         centerTitle: false,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
-          onPressed: widget.onBack,
+          onPressed: (){Navigator.pop(context);},
         ),
         actions: [
           IconButton(
